@@ -8,13 +8,10 @@ plugins {
 group = "com.example"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
+repositories(RepositoryHandler::mavenCentral)
 
 dependencies {
     implementation("org.anglur:joglext:1.0.3")
-    testImplementation(kotlin("test"))
 }
 
 tasks.withType<KotlinCompile> {
@@ -23,5 +20,5 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("ApplicationKt")
 }
