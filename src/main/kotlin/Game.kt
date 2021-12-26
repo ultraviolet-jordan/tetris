@@ -56,8 +56,8 @@ class Game {
 
     fun moveOnXAxis(x: Int) {
         synchronized(lock) {
-            val left = x == -1
             // We have to check both sides of the tetromino on the x-axis since they both can collide depending on user input.
+            val left = x == -1
             // Check if the tetromino collides on the bottom Y-axis.
             if (yAxisFacing().any { collides(it.x + offset.x, it.y + offset.y + 1) }) return
             // Check if the tetromino collides on the X-axis.
