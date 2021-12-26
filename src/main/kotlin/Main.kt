@@ -1,3 +1,0 @@
-fun main() {
-    Tetris().open()
-}
