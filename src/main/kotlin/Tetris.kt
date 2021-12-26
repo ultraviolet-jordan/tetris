@@ -156,7 +156,7 @@ class Tetris : GLEventListener {
     }
 
     private fun collides(x: Int, y: Int): Boolean = board[x][y] != Color.BLACK
-    private fun leadingYPoints(): List<Point> = currentTetromino.points.filter { board[it.x + offsetX][it.y + offsetY + 1] == Color.BLACK || board[it.x + offsetX][it.y + offsetY + 1] == Color(128, 124, 124) }
+    private fun leadingYPoints(): List<Point> = currentTetromino.points.filter { it.y == currentTetromino.points.maxOf { p -> p.y } }
     private fun trailingXPoints(): List<Point> = currentTetromino.points.filter { it.x == currentTetromino.points.minOf { p -> p.x } }
     private fun leadingXPoints(): List<Point> = currentTetromino.points.filter { it.x == currentTetromino.points.maxOf { p -> p.x } }
 
