@@ -5,8 +5,8 @@ import kotlin.system.exitProcess
 /**
  * @author Jordan Abraham
  */
-class GameWindowListener(
-    private val gameCapture: GameCapture
+class TetrisWindowListener(
+    private val gameCapture: TetrisGameCapture
 ) : WindowAdapter() {
     override fun windowDestroyNotify(e: WindowEvent) {
         gameCapture.animator.stop()

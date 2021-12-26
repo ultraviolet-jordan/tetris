@@ -4,10 +4,10 @@ import com.jogamp.opengl.util.FPSAnimator
 /**
  * @author Jordan Abraham
  */
-class GameCapture(
+class TetrisGameCapture(
     window: GLWindow,
     targetFramesPerSecond: Int,
-    val game: Game
+    val tetris: Tetris
 ) {
     val animator = FPSAnimator(window, targetFramesPerSecond, true)
 }

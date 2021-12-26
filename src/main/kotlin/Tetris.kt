@@ -3,10 +3,11 @@ import java.awt.Color
 /**
  * @author Jordan Abraham
  */
-class Game {
+class Tetris {
 
     private val lock = Object()
-    private val gameBoard = GameBoard()
+    private val tetrisBoard = TetrisBoard()
+
     private val saved = mutableMapOf<Point, Color>()
     private var tetromino = tetrominoes.random()
     private var offset = Point(5, 0)
@@ -36,21 +37,21 @@ class Game {
         }
     }
 
-    private fun paintSaved() = saved.forEach { gameBoard.set(it.key.x, it.key.y, it.value) }
+    private fun paintSaved() = saved.forEach { tetrisBoard.set(it.key.x, it.key.y, it.value) }
 
     private fun paintPoints(points: Array<Point>) {
         // Paint the current tetromino the user has control of.
-        gameBoard.fill(points, offset.x, 0, tetromino.color)
+        tetrisBoard.fill(points, offset.x, 0, tetromino.color)
         // Paint the saved points already on the board.
         paintSaved()
     }
 
     private fun disposeTetromino(offsetX: Int, offsetY: Int) {
         // Doing it like this is much more efficient than looping the whole board to clear the last tetromino.
-        gameBoard.fill(tetromino.points, offsetX, offsetY, Color.BLACK)
+        tetrisBoard.fill(tetromino.points, offsetX, offsetY, Color.BLACK)
     }
 
-    private fun collides(x: Int, y: Int): Boolean = Point(x, y) in saved || !gameBoard.isColor(x, y, Color.BLACK)
+    private fun collides(x: Int, y: Int): Boolean = Point(x, y) in saved || !tetrisBoard.isColor(x, y, Color.BLACK)
     private fun yAxisFacing(): List<Point> = tetromino.points.filter { Point(it.x, it.y + 1) !in tetromino.points }
     private fun xAxisFacing(left: Boolean): List<Point> = tetromino.points.filter { Point(if (left) it.x - 1 else it.x + 1, it.y) !in tetromino.points }
 
@@ -85,7 +86,7 @@ class Game {
 
     fun getColor(x: Int, y: Int): Color {
         synchronized(lock) {
-            return gameBoard.get(x, y)
+            return tetrisBoard.get(x, y)
         }
     }
 

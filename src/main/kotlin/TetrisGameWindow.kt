@@ -5,16 +5,16 @@ import kotlin.time.measureTime
 /**
  * @author Jordan Abraham
  */
-class GameWindow(
-    game: Game
+class TetrisGameWindow(
+    tetris: Tetris
 ) {
 
     private val window = GLWindow.create(GLCapabilities(null))
-    private val gameCapture = GameCapture(window, 60, game)
+    private val gameCapture = TetrisGameCapture(window, 60, tetris)
 
     init {
-        window.addKeyListener(GameKeyListener(gameCapture))
-        window.addWindowListener(GameWindowListener(gameCapture))
+        window.addKeyListener(TetrisGameKeyListener(gameCapture))
+        window.addWindowListener(TetrisWindowListener(gameCapture))
         window.addGLEventListener(Tetris2DGraphics(gameCapture))
 
         window.setSize(12 * 25, 21 * 25)
@@ -27,7 +27,7 @@ class GameWindow(
 
         do {
             val time = measureTime {
-                gameCapture.game.tick()
+                gameCapture.tetris.tick()
             }
             Thread.sleep(1000)
             println("Loop took $time to complete.")

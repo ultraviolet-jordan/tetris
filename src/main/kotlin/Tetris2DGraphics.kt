@@ -11,7 +11,7 @@ import java.awt.Font
  * @author Jordan Abraham
  */
 class Tetris2DGraphics(
-    private val gameCapture: GameCapture
+    private val gameCapture: TetrisGameCapture
 ) : GLEventListener {
 
     private val gl = GLGraphics2D()
@@ -34,7 +34,7 @@ class Tetris2DGraphics(
         gl.drawRect(0, 0, drawable.surfaceWidth, drawable.surfaceHeight)
         (0 until 12).forEach { x ->
             (0 until 21).forEach { y ->
-                gl.color = gameCapture.game.getColor(x, y)
+                gl.color = gameCapture.tetris.getColor(x, y)
                 gl.fill3DRect(x * 25, y * 25, 25, 25, true)
             }
         }

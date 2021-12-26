@@ -1,4 +1,4 @@
 /**
  * @author Jordan Abraham
  */
-fun main() { GameWindow(Game()) }
+fun main() { TetrisGameWindow(Tetris()) }
