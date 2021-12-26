@@ -1,29 +1,29 @@
+import TetrisBoard.collides
 import java.awt.Color
 
 /**
  * @author Jordan Abraham
  */
-class Tetris {
+class Tetris(
+    private var startingPoint: Point = Point(5, 0)
+) {
 
     private val lock = Object()
-    private val tetrisBoard = TetrisBoard()
 
-    private val saved = mutableMapOf<Point, Color>()
     private var tetromino = tetrominoes.random()
-    private var offset = Point(5, 0)
 
     fun tick() {
         synchronized(lock) {
             // Wipe the board. This is temporary as we repaint the saved tetrominoes next.
-            disposeTetromino(offset.x, offset.y)
+            disposeTetromino(startingPoint.x, startingPoint.y)
             // Paint the saved tetrominoes.
-            paintSaved()
+            TetrisBoard.paintSavedTetrominoes()
 
-            if (yAxisFacing().any { collides(it.x + offset.x, it.y + offset.y + 1) }) {
+            if (yAxisFacing().any { collides(it.x + startingPoint.x, it.y + startingPoint.y + 1) }) {
                 // Save the tetromino that just landed.
-                tetromino.points.forEach { saved[Point(it.x + offset.x, it.y + offset.y)] = tetromino.color }
+                TetrisBoard.saveTetromino(tetromino.points, startingPoint.x, startingPoint.y, tetromino.color)
                 // The default offset.
-                offset = Point(5, 0)
+                startingPoint = Point(5, 0)
 
                 tetromino = tetrominoes.random()
                 // Paint the new tetromino.
@@ -32,61 +32,58 @@ class Tetris {
             }
 
             // Move the current tetromino and change the offset.
-            paintPoints(tetromino.points.map { Point(it.x, it.y + offset.y + 1) }.toTypedArray())
-            offset = Point(offset.x, offset.y + 1)
+            paintPoints(tetromino.points.map { Point(it.x, it.y + startingPoint.y + 1) }.toTypedArray())
+            startingPoint = Point(startingPoint.x, startingPoint.y + 1)
         }
     }
-
-    private fun paintSaved() = saved.forEach { tetrisBoard.set(it.key.x, it.key.y, it.value) }
 
     private fun paintPoints(points: Array<Point>) {
         // Paint the current tetromino the user has control of.
-        tetrisBoard.fill(points, offset.x, 0, tetromino.color)
+        TetrisBoard.paintTetromino(points, startingPoint.x, 0, tetromino.color)
         // Paint the saved points already on the board.
-        paintSaved()
+        TetrisBoard.paintSavedTetrominoes()
     }
 
-    private fun disposeTetromino(offsetX: Int, offsetY: Int) {
+    private fun disposeTetromino(deltaX: Int, deltaY: Int) {
         // Doing it like this is much more efficient than looping the whole board to clear the last tetromino.
-        tetrisBoard.fill(tetromino.points, offsetX, offsetY, Color.BLACK)
+        TetrisBoard.paintTetromino(tetromino.points, deltaX, deltaY, Color.BLACK)
     }
 
-    private fun collides(x: Int, y: Int): Boolean = Point(x, y) in saved || !tetrisBoard.isColor(x, y, Color.BLACK)
     private fun yAxisFacing(): List<Point> = tetromino.points.filter { Point(it.x, it.y + 1) !in tetromino.points }
     private fun xAxisFacing(left: Boolean): List<Point> = tetromino.points.filter { Point(if (left) it.x - 1 else it.x + 1, it.y) !in tetromino.points }
 
-    fun moveOnXAxis(x: Int) {
+    fun moveOnXAxis(deltaX: Int) {
         synchronized(lock) {
             // We have to check both sides of the tetromino on the x-axis since they both can collide depending on user input.
-            val left = x == -1
+            val left = deltaX == -1
             // Check if the tetromino collides on the bottom Y-axis.
-            if (yAxisFacing().any { collides(it.x + offset.x, it.y + offset.y + 1) }) return
+            if (yAxisFacing().any { collides(it.x + startingPoint.x, it.y + startingPoint.y + 1) }) return
             // Check if the tetromino collides on the X-axis.
-            if (xAxisFacing(left).any { collides(it.x + (if (left) offset.x - 1 else offset.x + 1), it.y + offset.y) }) return
+            if (xAxisFacing(left).any { collides(it.x + (if (left) startingPoint.x - 1 else startingPoint.x + 1), it.y + startingPoint.y) }) return
 
-            offset = Point(offset.x + x, offset.y)
+            startingPoint = Point(startingPoint.x + deltaX, startingPoint.y)
 
-            disposeTetromino(if (x == -1) offset.x + 1 else offset.x - 1, offset.y)
-            paintPoints(tetromino.points.map { Point(it.x, it.y + offset.y) }.toTypedArray())
+            disposeTetromino(if (deltaX == -1) startingPoint.x + 1 else startingPoint.x - 1, startingPoint.y)
+            paintPoints(tetromino.points.map { Point(it.x, it.y + startingPoint.y) }.toTypedArray())
         }
     }
 
-    fun moveOnYAxis(y: Int) {
+    fun moveOnYAxis(deltaY: Int) {
         synchronized(lock) {
             // We only have to check collision on the closest point(s) to the bottom y-axis. The user can't move up on the y-axis.
-            if (yAxisFacing().any { collides(it.x + offset.x, it.y + offset.y + 1) }) return
+            if (yAxisFacing().any { collides(it.x + startingPoint.x, it.y + startingPoint.y + 1) }) return
 
-            offset = Point(offset.x, offset.y + y)
+            startingPoint = Point(startingPoint.x, startingPoint.y + deltaY)
 
             // coerceAtLeast() because a new tetromino starts at the very top.
-            disposeTetromino(offset.x, (offset.y - 1).coerceAtLeast(0))
-            paintPoints(tetromino.points.map { Point(it.x, it.y + offset.y) }.toTypedArray())
+            disposeTetromino(startingPoint.x, (startingPoint.y - 1).coerceAtLeast(0))
+            paintPoints(tetromino.points.map { Point(it.x, it.y + startingPoint.y) }.toTypedArray())
         }
     }
 
     fun getColor(x: Int, y: Int): Color {
         synchronized(lock) {
-            return tetrisBoard.get(x, y)
+            return TetrisBoard.get(x, y)
         }
     }
 

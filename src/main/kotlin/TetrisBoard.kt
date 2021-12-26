@@ -3,9 +3,14 @@ import java.awt.Color
 /**
  * @author Jordan Abraham
  */
-class TetrisBoard {
+object TetrisBoard {
 
-    private val grid = Array(SIZEX) { x -> Array(SIZEY) { y -> if (x == 0 || x == 11 || y == 20) DARK_GREY else Color.BLACK } }
+    private val DARK_GREY = Color(128, 124, 124)
+
+    private val grid = Array(12) { x -> Array(21) { y -> if (x == 0 || x == 11 || y == 20) DARK_GREY else Color.BLACK } }
+    private val savedTetrominoes = mutableMapOf<Point, Color>()
+
+    fun collides(x: Int, y: Int): Boolean = Point(x, y) in savedTetrominoes || grid[x][y] != Color.BLACK
 
     fun set(x: Int, y: Int, color: Color) {
         grid[x][y] = color
@@ -13,17 +18,9 @@ class TetrisBoard {
 
     fun get(x: Int, y: Int): Color = grid[x][y]
 
-    fun isColor(x: Int, y: Int, color: Color): Boolean = grid[x][y] == color
+    fun paintTetromino(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { set(it.x + deltaX, it.y + deltaY, color) }
 
-    fun fill(points: Array<Point>, offsetX: Int, offsetY: Int, color: Color) = points.forEach { set(it.x + offsetX, it.y + offsetY, color) }
+    fun saveTetromino(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { savedTetrominoes[Point(it.x + deltaX, it.y + deltaY)] = color }
 
-    private companion object {
-        // 10 for game tetrominoes and 2 for the boundaries.
-        private const val SIZEX = 12
-
-        // 20 for the game tetrominoes and 1 for the boundary.
-        private const val SIZEY = 21
-
-        private val DARK_GREY = Color(128, 124, 124)
-    }
+    fun paintSavedTetrominoes() = savedTetrominoes.forEach { set(it.key.x, it.key.y, it.value) }
 }
