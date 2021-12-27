@@ -33,7 +33,7 @@ class Tetris2DGraphics(
         gl.prePaint(drawable.context)
         gl.drawRect(0, 0, drawable.surfaceWidth, drawable.surfaceHeight)
         (0 until 12).forEach { x ->
-            (0 until 21).forEach { y ->
+            (0 until 22).forEach { y ->
                 gl.color = gameCapture.tetris.getColor(x, y)
                 gl.fill3DRect(x * 25, y * 25, 25, 25, true)
             }

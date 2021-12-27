@@ -30,7 +30,9 @@ class Tetris {
                 // Paint the new tetromino.
                 paintPoints(tetromino.points)
 
-                repeat(20) { y ->
+                repeat(21) { y ->
+                    // Check for the game boundary on the Y-axis.
+                    if (y == 0 || y == 21) return@repeat
                     if (board.checkRowComplete(y)) {
                         repeat(11) { x ->
                             // Check for the game boundary on the X-axis.
@@ -119,44 +121,49 @@ class Tetris {
 
     private companion object {
 
+        private val CYAN = Color(0, 255, 255)
         private val PURPLE = Color(161, 0, 240)
+        private val ORANGE = Color(255, 120, 0)
+        private val BLUE = Color(0, 0, 172)
+        private val YELLOW = Color(255, 255, 0)
+        private val GREEN = Color(0, 255, 0)
 
         // All the tetrominoes that can be used in the game.
         private val tetrominoes = arrayOf(
-            Tetromino(Color.CYAN, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(3, 1))),
-            Tetromino(Color.CYAN, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(1, 3))),
-            Tetromino(Color.CYAN, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(3, 1))),
-            Tetromino(Color.CYAN, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(1, 3))),
+            Tetromino(CYAN, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(4, 2))),
+            Tetromino(CYAN, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(2, 4))),
+            Tetromino(CYAN, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(4, 2))),
+            Tetromino(CYAN, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(2, 4))),
 
-            Tetromino(Color.ORANGE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(2, 0))),
-            Tetromino(Color.ORANGE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 2))),
-            Tetromino(Color.ORANGE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(0, 2))),
-            Tetromino(Color.ORANGE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 0))),
+            Tetromino(ORANGE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(3, 1))),
+            Tetromino(ORANGE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(3, 3))),
+            Tetromino(ORANGE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(1, 3))),
+            Tetromino(ORANGE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(1, 1))),
 
-            Tetromino(Color.BLUE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(2, 2))),
-            Tetromino(Color.BLUE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 2))),
-            Tetromino(Color.BLUE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(0, 0))),
-            Tetromino(Color.BLUE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 0))),
+            Tetromino(BLUE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(3, 3))),
+            Tetromino(BLUE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(1, 3))),
+            Tetromino(BLUE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(1, 1))),
+            Tetromino(BLUE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(3, 1))),
 
-            Tetromino(Color.YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
-            Tetromino(Color.YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
-            Tetromino(Color.YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
-            Tetromino(Color.YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
+            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
+            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
+            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
+            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
 
-            Tetromino(Color.GREEN, arrayOf(Point(1, 0), Point(2, 0), Point(0, 1), Point(1, 1))),
-            Tetromino(Color.GREEN, arrayOf(Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
-            Tetromino(Color.GREEN, arrayOf(Point(1, 0), Point(2, 0), Point(0, 1), Point(1, 1))),
-            Tetromino(Color.GREEN, arrayOf(Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
+            Tetromino(GREEN, arrayOf(Point(2, 1), Point(3, 1), Point(1, 2), Point(2, 2))),
+            Tetromino(GREEN, arrayOf(Point(1, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
+            Tetromino(GREEN, arrayOf(Point(2, 1), Point(3, 1), Point(1, 2), Point(2, 2))),
+            Tetromino(GREEN, arrayOf(Point(1, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
 
-            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(2, 1))),
-            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
-            Tetromino(PURPLE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(1, 2))),
-            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(1, 1), Point(2, 1), Point(1, 2))),
+            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(3, 2))),
+            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
+            Tetromino(PURPLE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(2, 3))),
+            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(2, 2), Point(3, 2), Point(2, 3))),
 
-            Tetromino(Color.RED, arrayOf(Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1))),
-            Tetromino(Color.RED, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(0, 2))),
-            Tetromino(Color.RED, arrayOf(Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1))),
-            Tetromino(Color.RED, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(0, 2))),
+            Tetromino(Color.RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
+            Tetromino(Color.RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
+            Tetromino(Color.RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
+            Tetromino(Color.RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
         )
     }
 }

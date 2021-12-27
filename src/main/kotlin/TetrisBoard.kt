@@ -5,7 +5,7 @@ import java.awt.Color
  */
 class TetrisBoard {
 
-    private val grid = Array(12) { x -> Array(21) { y -> if (x == 0 || x == 11 || y == 20) Color(128, 124, 124) else Color.BLACK } }
+    private val grid = Array(12) { x -> Array(22) { y -> if (x == 0 || x == 11 || y == 0 || y == 21) Color(128, 124, 124) else Color.BLACK } }
     private val savedTetrominoes = mutableMapOf<Point, Color>()
 
     fun get(x: Int, y: Int): Color = grid[x][y]

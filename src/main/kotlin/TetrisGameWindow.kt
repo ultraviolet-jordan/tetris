@@ -17,7 +17,7 @@ class TetrisGameWindow(
         window.addWindowListener(TetrisWindowListener(gameCapture))
         window.addGLEventListener(Tetris2DGraphics(gameCapture))
 
-        window.setSize(12 * 25, 21 * 25)
+        window.setSize(12 * 25, 22 * 25)
         window.title = "Tetris"
         window.isResizable = false
         window.isVisible = true
