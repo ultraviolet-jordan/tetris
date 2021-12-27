@@ -34,18 +34,15 @@ class Tetris2DGraphics(
         gl.drawRect(0, 0, drawable.surfaceWidth, drawable.surfaceHeight)
         val width = 25
         val height = 25
-        (0 until 12).forEach { x ->
-            (0 until 22).forEach { y ->
-                gl.color = gameCapture.tetris.getColor(x, y)
-
-                val brighter = gl.color.brighter()
-                val darker = gl.color.darker()
-
+        repeat(12) { x ->
+            repeat(22) { y ->
+                val color = gameCapture.tetris.getColor(x, y)
+                gl.color = color
                 gl.fillRect((x * 25) + 3, (y * 25) + 3, width - 2, height - 2)
-                gl.color = brighter
+                gl.color = color.brighter()
                 gl.fillRect((x * 25), (y * 25), 3, height)
                 gl.fillRect((x * 25) + 3, (y * 25), width - 2, 3)
-                gl.color = darker
+                gl.color = color.darker()
                 gl.fillRect((x * 25) + 3, (y * 25) + height - 3, width - 3, 3)
                 gl.fillRect((x * 25) + width - 3, (y * 25), 3, height - 3)
             }
