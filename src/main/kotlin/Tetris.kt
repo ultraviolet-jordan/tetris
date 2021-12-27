@@ -127,6 +127,7 @@ class Tetris {
         private val BLUE = Color(0, 0, 172)
         private val YELLOW = Color(255, 255, 0)
         private val GREEN = Color(0, 255, 0)
+        private val RED = Color(255, 0, 0)
 
         // All the tetrominoes that can be used in the game.
         private val tetrominoes = arrayOf(
@@ -160,10 +161,10 @@ class Tetris {
             Tetromino(PURPLE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(2, 3))),
             Tetromino(PURPLE, arrayOf(Point(2, 1), Point(2, 2), Point(3, 2), Point(2, 3))),
 
-            Tetromino(Color.RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
-            Tetromino(Color.RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
-            Tetromino(Color.RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
-            Tetromino(Color.RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
+            Tetromino(RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
+            Tetromino(RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
+            Tetromino(RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
+            Tetromino(RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
         )
     }
 }
