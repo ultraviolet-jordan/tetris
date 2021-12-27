@@ -18,15 +18,31 @@ class Tetris {
             // Paint the saved tetrominoes.
             board.paintSavedTetrominoes()
 
-            if (yAxisFacing().any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) {
+            // Checks if the current tetromino landed on the closest Y-axis.
+            if (tetromino.pointsAxis(deltaY = 1).any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) {
                 // Save the tetromino that just landed.
                 board.saveTetromino(tetromino.points, offset.x, offset.y, tetromino.color)
+
                 // The default offset.
                 offset = Point(5, 0)
 
                 tetromino = tetrominoes.random()
                 // Paint the new tetromino.
                 paintPoints(tetromino.points)
+
+                repeat(20) { y ->
+                    if (board.checkRowComplete(y)) {
+                        repeat(11) { x ->
+                            // Check for the game boundary on the X-axis.
+                            if (x != 0 && x != 11) {
+                                board.set(x, y, Color.BLACK)
+                                board.removePoint(x, y)
+                            }
+                        }
+                        board.shiftDown(y)
+                        board.paintSavedTetrominoes()
+                    }
+                }
                 return
             }
 
@@ -48,17 +64,14 @@ class Tetris {
         board.paintTetromino(tetromino.points, deltaX, deltaY, Color.BLACK)
     }
 
-    private fun yAxisFacing(): List<Point> = tetromino.points.filter { Point(it.x, it.y + 1) !in tetromino.points }
-    private fun xAxisFacing(left: Boolean): List<Point> = tetromino.points.filter { Point(if (left) it.x - 1 else it.x + 1, it.y) !in tetromino.points }
-
     fun moveOnXAxis(deltaX: Int) {
         synchronized(lock) {
             // We have to check both sides of the tetromino on the x-axis since they both can collide depending on user input.
-            val left = deltaX == -1
+            val counterClockwise = deltaX == -1
             // Check if the tetromino collides on the bottom Y-axis.
-            if (yAxisFacing().any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) return
+            if (tetromino.pointsAxis(deltaY = 0).any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) return
             // Check if the tetromino collides on the X-axis.
-            if (xAxisFacing(left).any { board.collides(it.x + (if (left) offset.x - 1 else offset.x + 1), it.y + offset.y) }) return
+            if (tetromino.pointsAxis(counterClockwise, deltaX = 1).any { board.collides(it.x + (if (counterClockwise) offset.x - 1 else offset.x + 1), it.y + offset.y) }) return
 
             offset = Point(offset.x + deltaX, offset.y)
 
@@ -70,12 +83,30 @@ class Tetris {
     fun moveOnYAxis(deltaY: Int) {
         synchronized(lock) {
             // We only have to check collision on the closest point(s) to the bottom y-axis. The user can't move up on the y-axis.
-            if (yAxisFacing().any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) return
+            if (tetromino.pointsAxis(deltaY = 1).any { board.collides(it.x + offset.x, it.y + offset.y + 1) }) return
 
             offset = Point(offset.x, offset.y + deltaY)
 
             // coerceAtLeast() because a new tetromino starts at the very top.
             disposeTetromino(offset.x, (offset.y - 1).coerceAtLeast(0))
+            paintPoints(tetromino.points.map { Point(it.x, it.y + offset.y) }.toTypedArray())
+        }
+    }
+
+    fun rotate(counterClockwise: Boolean) {
+        synchronized(lock) {
+            // Create a new collection because we only need to rotate between all possible variations of the same kind of tetromino.
+            // This is based on color since each one is a unique color.
+            val possibleTetrominoes = tetrominoes.filter { it.color == tetromino.color }.toList()
+            val index = possibleTetrominoes.indexOf(tetromino)
+            // The next possible tetromino we can use depending on the rotation type.
+            val next = possibleTetrominoes.elementAtOrElse(if (counterClockwise) index - 1 else index + 1) { if (counterClockwise) possibleTetrominoes.last() else possibleTetrominoes.first() }
+            // Check for collision for the next possible tetromino.
+            if (next.points.filter { Point(it.x, it.y) !in tetromino.points }.any { board.collides(it.x + offset.x, it.y + offset.y) }) return
+
+            // Set the new tetromino and repaint.
+            disposeTetromino(offset.x, offset.y)
+            tetromino = next
             paintPoints(tetromino.points.map { Point(it.x, it.y + offset.y) }.toTypedArray())
         }
     }

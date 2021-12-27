@@ -17,4 +17,19 @@ class TetrisBoard {
     fun paintTetromino(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { set(it.x + deltaX, it.y + deltaY, color) }
     fun saveTetromino(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { savedTetrominoes[Point(it.x + deltaX, it.y + deltaY)] = color }
     fun paintSavedTetrominoes() = savedTetrominoes.forEach { set(it.key.x, it.key.y, it.value) }
+    fun checkRowComplete(y: Int): Boolean = (grid.all { it[y] != Color.BLACK })
+    fun removePoint(x: Int, y: Int) = savedTetrominoes.remove(Point(x, y))
+    fun shiftDown(deltaY: Int) = with(mutableMapOf<Point, Color>()) {
+        putAll(savedTetrominoes)
+        savedTetrominoes.clear()
+        forEach {
+            if (it.key.y <= deltaY) {
+                set(it.key.x, it.key.y, Color.BLACK)
+                savedTetrominoes[Point(it.key.x, it.key.y + 1)] = it.value
+            } else {
+                set(it.key.x, it.key.y, it.value)
+                savedTetrominoes[Point(it.key.x, it.key.y)] = it.value
+            }
+        }
+    }
 }

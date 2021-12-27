@@ -23,12 +23,11 @@ class TetrisGameWindow(
         window.isVisible = true
 
         // Start the animator after the user can see game.
+        gameCapture.animator.setUpdateFPSFrames(3, null)
         gameCapture.animator.start()
 
         do {
-            val time = measureTime {
-                gameCapture.tetris.tick()
-            }
+            val time = measureTime { gameCapture.tetris.tick() }
             Thread.sleep(1000)
             println("Loop took $time to complete.")
         } while (!Thread.interrupted())

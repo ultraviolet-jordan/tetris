@@ -40,7 +40,7 @@ class Tetris2DGraphics(
         }
         textRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
         textRenderer.setColor(Color.GREEN)
-        textRenderer.draw("${gameCapture.animator.fps}", 1, drawable.surfaceHeight - 15)
+        textRenderer.draw("FPS: ${gameCapture.animator.lastFPS}", 1, drawable.surfaceHeight - 15)
         textRenderer.endRendering()
     }
 

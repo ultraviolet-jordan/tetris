@@ -12,7 +12,9 @@ class TetrisGameKeyListener(
         when (e.keyCode) {
             KeyEvent.VK_LEFT -> gameCapture.tetris.moveOnXAxis(-1)
             KeyEvent.VK_RIGHT -> gameCapture.tetris.moveOnXAxis(1)
-            KeyEvent.VK_DOWN -> gameCapture.tetris.moveOnYAxis(1)
+            KeyEvent.VK_DOWN -> gameCapture.tetris.rotate(false)
+            KeyEvent.VK_UP -> gameCapture.tetris.rotate(true)
+            KeyEvent.VK_SPACE -> gameCapture.tetris.moveOnYAxis(1)
         }
     }
 

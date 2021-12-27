@@ -22,3 +22,5 @@ data class Tetromino(
         return points.contentHashCode()
     }
 }
+
+fun Tetromino.pointsAxis(left: Boolean = false, deltaX: Int = 0, deltaY: Int = 0): List<Point> = points.filter { Point(if (left) it.x - deltaX else it.x + deltaX, it.y + deltaY) !in points }
