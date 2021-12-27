@@ -32,10 +32,22 @@ class Tetris2DGraphics(
         drawable.gl.gL2.glClear(GL.GL_COLOR_BUFFER_BIT)
         gl.prePaint(drawable.context)
         gl.drawRect(0, 0, drawable.surfaceWidth, drawable.surfaceHeight)
+        val width = 25
+        val height = 25
         (0 until 12).forEach { x ->
             (0 until 22).forEach { y ->
                 gl.color = gameCapture.tetris.getColor(x, y)
-                gl.fill3DRect(x * 25, y * 25, 25, 25, true)
+
+                val brighter = gl.color.brighter()
+                val darker = gl.color.darker()
+
+                gl.fillRect((x * 25) + 3, (y * 25) + 3, width - 2, height - 2)
+                gl.color = brighter
+                gl.fillRect((x * 25), (y * 25), 3, height)
+                gl.fillRect((x * 25) + 3, (y * 25), width - 2, 3)
+                gl.color = darker
+                gl.fillRect((x * 25) + 3, (y * 25) + height - 3, width - 3, 3)
+                gl.fillRect((x * 25) + width - 3, (y * 25), 3, height - 3)
             }
         }
         textRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
