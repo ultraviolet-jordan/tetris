@@ -1,7 +1,7 @@
 # A Fast Tetris Game Written in Kotlin Using JOGL.
 
-![gameplay](https://github.com/ultraviolet-jordan/tetris/blob/main/game_play.png)
-![gameover](https://github.com/ultraviolet-jordan/tetris/blob/main/game_over.png)
+![gameplay](https://github.com/ultraviolet-jordan/tetris/blob/main/gameplay.png)
+![gameover](https://github.com/ultraviolet-jordan/tetris/blob/main/gameover.png)
 
 # Controls
 - Arrow Key Left / Right -> Move the tetromino along the x-axis.
