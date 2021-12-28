@@ -26,11 +26,6 @@ class Tetris2DGraphics(
     }
 
     override fun display(drawable: GLAutoDrawable) {
-        // Set up the renderers here because the game scale can change.
-        val fpsRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
-        val scoreRenderer = TextRenderer(Font("Default", Font.BOLD, (gameCapture.scale / 2) + 8), true, true)
-        val gameOverRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
-
         val scale = gameCapture.scale
         val half = scale / 2
         val quarter = scale / 4
@@ -39,6 +34,7 @@ class Tetris2DGraphics(
         drawable.gl.gL2.glClear(GL.GL_COLOR_BUFFER_BIT)
         graphics.prePaint(drawable.context)
 
+        // Draw the grid and stylize.
         repeat(12) { x ->
             repeat(22) { y ->
                 val color = if (gameCapture.tetris.playing) gameCapture.tetris.getColor(x, y) else gameCapture.tetris.getColor(x, y).darker().darker()
@@ -57,29 +53,40 @@ class Tetris2DGraphics(
                 graphics.fillRect(widthX + scale - eighth, widthY, eighth, scale - eighth)
             }
         }
-        // The score backdrop.
+        // Draw the score backdrop.
         graphics.color = Color.BLACK
         graphics.fillRect(3, (scale * 21) + eighth, scale * 6 - 4, scale - quarter)
 
-        scoreRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
-        scoreRenderer.setColor(Color.WHITE)
-        scoreRenderer.draw("SCORE: ${gameCapture.tetris.score}", 5, drawable.surfaceHeight - (((scale * 21) + scale - eighth)) + eighth)
-        scoreRenderer.endRendering()
+        // Draw the score.
+        TextRenderer(Font("Default", Font.BOLD, (gameCapture.scale / 2) + 6), true, true).let {
+            it.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+            it.setColor(Color.WHITE)
+            it.draw("SCORE: ${gameCapture.tetris.score}", 5, drawable.surfaceHeight - (((scale * 21) + scale - eighth)) + eighth)
+            it.endRendering()
+        }
 
-        fpsRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
-        fpsRenderer.setColor(Color.GREEN)
-        fpsRenderer.draw("FPS: ${gameCapture.animator.lastFPS}", 1, drawable.surfaceHeight - scale + (half + eighth))
-        fpsRenderer.endRendering()
+        // Draw the game FPS.
+        TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true).let {
+            it.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+            it.setColor(Color.GREEN)
+            it.draw("FPS: ${gameCapture.animator.lastFPS}", 1, drawable.surfaceHeight - scale + (half + eighth))
+            it.endRendering()
+        }
 
         if (gameCapture.tetris.playing.not()) {
-            gameOverRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
-            gameOverRenderer.setColor(Color.WHITE)
-            gameOverRenderer.draw("GAME OVER", ((scale * 6) - (half * 3) - quarter) + gameCapture.scale / 3, drawable.surfaceHeight / 2)
-            gameOverRenderer.endRendering()
+            // Draw the game over overlay.
+            TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true).let {
+                it.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+                it.setColor(Color.WHITE)
+                it.draw("GAME OVER", ((scale * 6) - (half * 3) - quarter) + gameCapture.scale / 3, drawable.surfaceHeight / 2)
+                it.endRendering()
+            }
         }
     }
 
     override fun reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
+        // Limit how small the game can look.
+        if (height / 22 < 15) return
         gameCapture.scale = height / 22
     }
 }
