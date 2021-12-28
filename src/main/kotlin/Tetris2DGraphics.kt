@@ -38,7 +38,7 @@ class Tetris2DGraphics(
         val height = 25
         repeat(12) { x ->
             repeat(22) { y ->
-                val color = if (gameCapture.tetris.playing) gameCapture.tetris.getColor(x, y) else gameCapture.tetris.getColor(x, y).darker()
+                val color = if (gameCapture.tetris.playing) gameCapture.tetris.getColor(x, y) else gameCapture.tetris.getColor(x, y).darker().darker()
                 gl.color = color
                 gl.fillRect((x * 25) + 3, (y * 25) + 3, width - 2, height - 2)
                 gl.color = color.brighter()
