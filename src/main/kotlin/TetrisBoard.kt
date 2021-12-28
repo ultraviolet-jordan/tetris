@@ -10,11 +10,36 @@ class TetrisBoard {
     private val grid = Array(COLS) { x -> Array(ROWS) { y -> if (x == 0 || x == 11 || y == 0 || y == 21) Color(128, 124, 124) else Color.BLACK } }
     private val points = mutableMapOf<Point, Color>()
 
-    fun getColor(x: Int, y: Int): Color = grid[x][y]
-    private fun setColor(x: Int, y: Int, color: Color) { grid[x][y] = color }
-    fun collides(x: Int, y: Int): Boolean = grid[x][y] != Color.BLACK || Point(x, y) in points
-    fun paintPoints(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { setColor(it.x + deltaX, it.y + deltaY, color) }
-    fun savePoints(points: Array<Point>, deltaX: Int, deltaY: Int, color: Color) = points.forEach { this.points[Point(it.x + deltaX, it.y + deltaY)] = color }
+    fun getColor(
+        x: Int,
+        y: Int
+    ): Color = grid[x][y]
+
+    private fun setColor(
+        x: Int,
+        y: Int,
+        color: Color
+    ) { grid[x][y] = color }
+
+    fun collides(
+        x: Int,
+        y: Int
+    ): Boolean = grid[x][y] != Color.BLACK || Point(x, y) in points
+
+    fun paintPoints(
+        points: Array<Point>,
+        deltaX: Int,
+        deltaY: Int,
+        color: Color
+    ) = points.forEach { setColor(it.x + deltaX, it.y + deltaY, color) }
+
+    fun savePoints(
+        points: Array<Point>,
+        deltaX: Int,
+        deltaY: Int,
+        color: Color
+    ) = points.forEach { this.points[Point(it.x + deltaX, it.y + deltaY)] = color }
+
     fun paintSavedPoints() = points.forEach { setColor(it.key.x, it.key.y, it.value) }
     fun checkRowFilled(y: Int): Boolean = (grid.all { it[y] != Color.BLACK })
 

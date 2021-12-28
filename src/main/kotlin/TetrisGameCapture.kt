@@ -9,6 +9,4 @@ class TetrisGameCapture(
     targetFramesPerSecond: Int,
     var scale: Int,
     val tetris: Tetris
-) {
-    val animator = FPSAnimator(window, targetFramesPerSecond, true)
-}
+) { val animator = FPSAnimator(window, targetFramesPerSecond, true) }

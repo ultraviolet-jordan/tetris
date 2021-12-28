@@ -141,11 +141,17 @@ class Tetris {
     }
 
     @Synchronized
-    fun getColor(x: Int, y: Int): Color = board.getColor(x, y)
+    fun getColor(
+        x: Int,
+        y: Int
+    ): Color = board.getColor(x, y)
 
-    private fun setOffset(toOffsetX: Int, toOffsetY: Int) {
-        offsetX = toOffsetX
-        offsetY = toOffsetY
+    private fun setOffset(
+        offsetX: Int,
+        offsetY: Int
+    ) {
+        this.offsetX = offsetX
+        this.offsetY = offsetY
     }
 
     private fun paintPoints(points: Array<Point>) {
@@ -155,7 +161,10 @@ class Tetris {
         board.paintSavedPoints()
     }
 
-    private fun disposeTetromino(deltaX: Int, deltaY: Int) {
+    private fun disposeTetromino(
+        deltaX: Int,
+        deltaY: Int
+    ) {
         // Doing it like this is much more efficient than looping the whole board to clear the last tetromino.
         board.paintPoints(tetromino.points, deltaX, deltaY, Color.BLACK)
     }

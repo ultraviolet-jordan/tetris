@@ -18,14 +18,17 @@ class Tetris2DGraphics(
 
     private val graphics = GLGraphics2D()
 
-    init { GLProfile.initSingleton() }
+    private lateinit var scoreRenderer: TextRenderer
+    private lateinit var fpsRenderer: TextRenderer
+    private lateinit var gameOverRenderer: TextRenderer
 
-    override fun init(drawable: GLAutoDrawable) {
+    init {
+        GLProfile.initSingleton()
+        attachRenderers()
     }
 
-    override fun dispose(drawable: GLAutoDrawable) {
-        graphics.glDispose()
-    }
+    override fun init(drawable: GLAutoDrawable) {}
+    override fun dispose(drawable: GLAutoDrawable) = graphics.glDispose()
 
     override fun display(drawable: GLAutoDrawable) {
         val scale = gameCapture.scale
@@ -66,7 +69,7 @@ class Tetris2DGraphics(
         graphics.fillRect(deltaX + 3, deltaY + ((scale * (ROWS - 1)) + eighth), scale * 6 - 4, scale - quarter)
 
         // Draw the score.
-        TextRenderer(Font("Default", Font.BOLD, half + 6), true, true).let {
+        scoreRenderer.let {
             it.beginRendering(width, height)
             it.setColor(Color.WHITE)
             it.draw("SCORE: ${gameCapture.tetris.score}", deltaX + 5, (height - (((scale * (ROWS - 1)) + scale - eighth)) + eighth) - deltaY)
@@ -74,7 +77,7 @@ class Tetris2DGraphics(
         }
 
         // Draw the game FPS.
-        TextRenderer(Font("Default", Font.BOLD, half), true, true).let {
+        fpsRenderer.let {
             it.beginRendering(width, height)
             it.setColor(Color.GREEN)
             it.draw("FPS: ${gameCapture.animator.lastFPS}", deltaX + 1, (height - scale + (half + eighth)) - deltaY)
@@ -83,18 +86,30 @@ class Tetris2DGraphics(
 
         if (gameCapture.tetris.playing.not()) {
             // Draw the game over overlay.
-            TextRenderer(Font("Default", Font.BOLD, half), true, true).let {
+            gameOverRenderer.let {
                 it.beginRendering(width, height)
                 it.setColor(Color.WHITE)
                 it.draw("GAME OVER", deltaX + (((scale * 6) - (half * 3) - quarter) + scale / 3), (height / 2) - deltaY)
                 it.endRendering()
             }
         }
+        graphics.postPaint()
     }
 
     override fun reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {
         // Limit how small the game can look.
         if (height / ROWS < 15) return
         gameCapture.scale = height / ROWS
+        // Dispose of the current renderers and update them due to a possible change in scaling.
+        scoreRenderer.dispose()
+        fpsRenderer.dispose()
+        gameOverRenderer.dispose()
+        attachRenderers()
+    }
+
+    private fun attachRenderers() {
+        scoreRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2 + 6), true, true)
+        fpsRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
+        gameOverRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
     }
 }

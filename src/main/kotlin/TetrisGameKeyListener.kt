@@ -19,6 +19,5 @@ class TetrisGameKeyListener(
         }
     }
 
-    override fun keyReleased(e: KeyEvent) {
-    }
+    override fun keyReleased(e: KeyEvent) { }
 }
