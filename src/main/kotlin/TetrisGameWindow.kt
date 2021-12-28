@@ -1,5 +1,9 @@
+import Constants.COLS
+import Constants.ROWS
+import Constants.TITLE
 import com.jogamp.newt.opengl.GLWindow
 import com.jogamp.opengl.GLCapabilities
+import java.awt.Toolkit
 import kotlin.time.measureTime
 
 /**
@@ -8,7 +12,6 @@ import kotlin.time.measureTime
 class TetrisGameWindow(
     tetris: Tetris
 ) {
-
     private val window = GLWindow.create(GLCapabilities(null))
     private val gameCapture = TetrisGameCapture(window, 144, 35, tetris)
 
@@ -18,8 +21,16 @@ class TetrisGameWindow(
         window.addGLEventListener(Tetris2DGraphics(gameCapture))
 
         // Game scaling is supported since Tetris uses squares.
-        window.setSize(12 * gameCapture.scale, 22 * gameCapture.scale)
-        window.title = "Tetris"
+        val width = COLS * gameCapture.scale
+        val height = ROWS * gameCapture.scale
+        window.setSize(width, height)
+        // Center window to monitor screen.
+        val screen = Toolkit.getDefaultToolkit().screenSize
+        val deltaX = (screen.width - width) / 2
+        val deltaY = (screen.height - height) / 2
+        window.setPosition(deltaX, deltaY)
+
+        window.title = TITLE
         window.isVisible = true
 
         // Start the animator after the user can see game.

@@ -1,3 +1,5 @@
+import Constants.COLS
+import Constants.ROWS
 import java.awt.Color
 
 /**
@@ -5,7 +7,7 @@ import java.awt.Color
  */
 class TetrisBoard {
 
-    private val grid = Array(12) { x -> Array(22) { y -> if (x == 0 || x == 11 || y == 0 || y == 21) Color(128, 124, 124) else Color.BLACK } }
+    private val grid = Array(COLS) { x -> Array(ROWS) { y -> if (x == 0 || x == 11 || y == 0 || y == 21) Color(128, 124, 124) else Color.BLACK } }
     private val points = mutableMapOf<Point, Color>()
 
     fun getColor(x: Int, y: Int): Color = grid[x][y]
@@ -43,8 +45,8 @@ class TetrisBoard {
     }
 
     fun reset() {
-        (1 until 11).forEach { x ->
-            (1 until 21).forEach { y ->
+        (1 until COLS - 1).forEach { x ->
+            (1 until ROWS - 1).forEach { y ->
                 setColor(x, y, Color.BLACK)
             }
         }

@@ -8,5 +8,10 @@
 - Arrow Key Up / Down -> Rotate the tetromino clockwise or counter-clockwise.
 - Space Bar -> Start a new game / Move the tetromino down along the y-axis.
 
-# TODO
-- Game is always left justified in the window; prefer centered.
+# Features
+- Collision.
+- Movement / rotating.
+- Score counter.
+- FPS counter.
+- Resolution scaling.
+- Runtime game loop time measurement.
