@@ -15,9 +15,7 @@ class Tetris {
     var playing = true
     var score = 0
 
-    init {
-        startNewGame()
-    }
+    init { startNewGame() }
 
     @Synchronized
     fun startNewGame() {
@@ -123,18 +121,18 @@ class Tetris {
         val y = offsetY
         // Create a new collection because we only need to rotate between all possible variations of the same kind of tetromino.
         // This is based on color since each one is a unique color.
-        val nextPossible = tetrominoes.filter { tetromino -> it.color == tetromino.color }.toList()
-        val index = nextPossible.indexOf(it)
         // The next possible tetromino we can use depending on the rotation type.
-        val next = nextPossible.elementAtOrElse(if (counterClockwise) index - 1 else index + 1) { if (counterClockwise) nextPossible.last() else nextPossible.first() }
+        val nextTetromino = with(tetrominoes.filter { tetromino -> it.color == tetromino.color }.toList()) {
+            elementAtOrElse(if (counterClockwise) indexOf(it) - 1 else indexOf(it) + 1) { if (counterClockwise) last() else first() }
+        }
         // Check for collision on the y-axis.
-        if (next.pointsAxis(deltaY = 1, otherPoints = it.points).any { point -> board.collides(point.x + x, point.y + y + 1) }) return
+        if (nextTetromino.pointsAxis(deltaY = 1, otherPoints = it.points).any { point -> board.collides(point.x + x, point.y + y + 1) }) return
         // Check for collision for the next possible tetromino.
-        if (next.pointsAxis(otherPoints = it.points).none { point -> board.collides(point.x + x, point.y + y) }) {
+        if (nextTetromino.pointsAxis(otherPoints = it.points).none { point -> board.collides(point.x + x, point.y + y) }) {
             // Set the new tetromino and repaint.
             disposeTetromino(x, y)
-            setTetromino(next)
-            paintPoints(next.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
+            setTetromino(nextTetromino)
+            paintPoints(nextTetromino.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
         }
     }
 

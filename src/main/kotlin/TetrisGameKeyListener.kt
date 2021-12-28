@@ -15,13 +15,7 @@ class TetrisGameKeyListener(
             KeyEvent.VK_RIGHT -> gameCapture.tetris.moveOnXAxis(1)
             KeyEvent.VK_DOWN -> gameCapture.tetris.rotate(false)
             KeyEvent.VK_UP -> gameCapture.tetris.rotate(true)
-            KeyEvent.VK_SPACE -> {
-                if (gameCapture.tetris.playing) {
-                    gameCapture.tetris.moveOnYAxis(1)
-                } else {
-                    gameCapture.tetris.startNewGame()
-                }
-            }
+            KeyEvent.VK_SPACE -> if (gameCapture.tetris.playing) gameCapture.tetris.moveOnYAxis(1) else gameCapture.tetris.startNewGame()
         }
     }
 
