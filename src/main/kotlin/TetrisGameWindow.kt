@@ -10,16 +10,16 @@ class TetrisGameWindow(
 ) {
 
     private val window = GLWindow.create(GLCapabilities(null))
-    private val gameCapture = TetrisGameCapture(window, 144, tetris)
+    private val gameCapture = TetrisGameCapture(window, 144, 35, tetris)
 
     init {
         window.addKeyListener(TetrisGameKeyListener(gameCapture))
         window.addWindowListener(TetrisWindowListener(gameCapture))
         window.addGLEventListener(Tetris2DGraphics(gameCapture))
 
-        window.setSize(12 * 25, 22 * 25)
+        // Game scaling is supported since Tetris uses squares.
+        window.setSize(12 * gameCapture.scale, 22 * gameCapture.scale)
         window.title = "Tetris"
-        window.isResizable = false
         window.isVisible = true
 
         // Start the animator after the user can see game.
