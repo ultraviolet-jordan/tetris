@@ -10,7 +10,7 @@ class TetrisGameWindow(
 ) {
 
     private val window = GLWindow.create(GLCapabilities(null))
-    private val gameCapture = TetrisGameCapture(window, 60, tetris)
+    private val gameCapture = TetrisGameCapture(window, 250, tetris)
 
     init {
         window.addKeyListener(TetrisGameKeyListener(gameCapture))
