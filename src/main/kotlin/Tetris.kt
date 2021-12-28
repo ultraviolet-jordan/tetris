@@ -117,8 +117,12 @@ class Tetris {
 
     @Synchronized
     fun rotate(counterClockwise: Boolean) = tetromino.let {
+        // No reason to actually rotate the square tetromino.
+        if (it.color == YELLOW) return
+
         val x = offsetX
         val y = offsetY
+
         // Create a new collection because we only need to rotate between all possible variations of the same kind of tetromino.
         // This is based on color since each one is a unique color.
         // The next possible tetromino we can use depending on the rotation type.
