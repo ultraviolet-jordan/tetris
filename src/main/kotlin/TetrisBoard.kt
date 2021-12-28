@@ -41,4 +41,13 @@ class TetrisBoard {
         points.putAll(shifted)
         paintSavedPoints()
     }
+
+    fun reset() {
+        (1 until 11).forEach { x ->
+            (1 until 21).forEach { y ->
+                setColor(x, y, Color.BLACK)
+            }
+        }
+        points.clear()
+    }
 }

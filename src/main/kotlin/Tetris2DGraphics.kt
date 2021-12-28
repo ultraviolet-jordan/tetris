@@ -15,7 +15,9 @@ class Tetris2DGraphics(
 ) : GLEventListener {
 
     private val gl = GLGraphics2D()
-    private val textRenderer = TextRenderer(Font("Default", Font.BOLD, 15), true, false)
+    private val fpsRenderer = TextRenderer(Font("Default", Font.BOLD, 15), true, true)
+    private val scoreRenderer = TextRenderer(Font("Default", Font.BOLD, 15), true, true)
+    private val gameOverRenderer = TextRenderer(Font("Default", Font.BOLD, 20), true, true)
 
     init {
         GLProfile.initSingleton()
@@ -36,7 +38,7 @@ class Tetris2DGraphics(
         val height = 25
         repeat(12) { x ->
             repeat(22) { y ->
-                val color = gameCapture.tetris.getColor(x, y)
+                val color = if (gameCapture.tetris.playing) gameCapture.tetris.getColor(x, y) else gameCapture.tetris.getColor(x, y).darker()
                 gl.color = color
                 gl.fillRect((x * 25) + 3, (y * 25) + 3, width - 2, height - 2)
                 gl.color = color.brighter()
@@ -47,10 +49,26 @@ class Tetris2DGraphics(
                 gl.fillRect((x * 25) + width - 3, (y * 25), 3, height - 3)
             }
         }
-        textRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
-        textRenderer.setColor(Color.GREEN)
-        textRenderer.draw("FPS: ${gameCapture.animator.lastFPS}", 1, drawable.surfaceHeight - 15)
-        textRenderer.endRendering()
+        // The score backdrop.
+        gl.color = Color.BLACK
+        gl.fillRect(3, drawable.surfaceHeight - 21, 145, 18)
+
+        scoreRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+        scoreRenderer.setColor(Color.WHITE)
+        scoreRenderer.draw("Score: ${gameCapture.tetris.score}", 5, 7)
+        scoreRenderer.endRendering()
+
+        fpsRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+        fpsRenderer.setColor(Color.GREEN)
+        fpsRenderer.draw("FPS: ${gameCapture.animator.lastFPS}", 1, drawable.surfaceHeight - 15)
+        fpsRenderer.endRendering()
+
+        if (gameCapture.tetris.playing.not()) {
+            gameOverRenderer.beginRendering(drawable.surfaceWidth, drawable.surfaceHeight)
+            gameOverRenderer.setColor(Color.WHITE)
+            gameOverRenderer.draw("Game Over", drawable.surfaceWidth / 3, drawable.surfaceHeight / 2)
+            gameOverRenderer.endRendering()
+        }
     }
 
     override fun reshape(drawable: GLAutoDrawable, x: Int, y: Int, width: Int, height: Int) {

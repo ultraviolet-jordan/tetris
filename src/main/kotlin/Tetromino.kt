@@ -23,4 +23,9 @@ data class Tetromino(
     }
 }
 
-fun Tetromino.pointsAxis(left: Boolean = false, deltaX: Int = 0, deltaY: Int = 0): List<Point> = points.filter { Point(if (left) it.x - deltaX else it.x + deltaX, it.y + deltaY) !in points }
+fun Tetromino.pointsAxis(
+    left: Boolean = false,
+    deltaX: Int = 0,
+    deltaY: Int = 0,
+    otherPoints: Array<Point>? = null
+): List<Point> = points.filter { Point(if (left) it.x - deltaX else it.x + deltaX, it.y + deltaY) !in (otherPoints ?: points) }

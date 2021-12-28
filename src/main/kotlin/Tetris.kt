@@ -1,4 +1,5 @@
 import java.awt.Color
+import kotlin.properties.Delegates
 
 /**
  * @author Jordan Abraham
@@ -7,67 +8,83 @@ class Tetris {
 
     private val board = TetrisBoard()
 
-    private var tetromino = tetrominoes.random()
-    private var offsetX = 0
-    private var offsetY = 0
+    private lateinit var tetromino: Tetromino
+    private var offsetX by Delegates.notNull<Int>()
+    private var offsetY by Delegates.notNull<Int>()
+
+    var playing = true
+    var score = 0
 
     init {
-        setOffset(5, 0)
+        startNewGame()
+    }
+
+    @Synchronized
+    fun startNewGame() {
+        // The player can start a new game when one ends, this is why we initialize like this.
+        setOffset(4, 0)
+        board.reset()
+        score = 0
+        tetromino = tetrominoes.random()
+        paintPoints(tetromino.points)
+        // This will ultimately start the game.
+        playing = true
     }
 
     @Synchronized
     fun tick() = tetromino.let {
+        if (playing.not()) return
+
         val x = offsetX
         val y = offsetY
 
         // Wipe the board. This is temporary as we repaint the saved tetrominoes next.
         disposeTetromino(x, y)
 
-        // Checks if the current tetromino landed on the closest Y-axis.
-        if (it.pointsAxis(deltaY = 1).none { point -> board.collides(point.x + x, point.y + y + 1) }) {
+        // Checks if the current tetromino landed on the closest Y-axis on another saved point.
+        if (it.pointsAxis().none { point -> board.collides(point.x + x, point.y + y) } &&
+            // Checks if the current tetromino landed on the closest Y-axis on a boundary.
+            it.pointsAxis(deltaY = 1).none { point -> board.collides(point.x + x, point.y + y + 1) }
+        ) {
             // Move the current tetromino and change the offset.
             paintPoints(it.points.map { point -> Point(point.x, point.y + y + 1) }.toTypedArray())
             setOffset(x, y + 1)
             return
         }
+
         // Save the tetromino that just landed.
         board.savePoints(it.points, x, y, it.color)
 
         // The default offset.
-        setOffset(5, 0)
+        setOffset(4, 0)
+
+        // This is to find the farthest point in the current tetromino to the bottom of the board on the Y-axis.
+        // This is much more efficient instead of unnecessarily looping the entire board to check for filled rows.
+        val landedYDelta = (y - it.points.minOf { point -> point.y })
+
+        // If this offset is <= 0 this means the tetromino crossed the border at the top when it landed. This means the game is over.
+        if (landedYDelta <= 0) {
+            playing = false
+            paintPoints(tetromino.points)
+            return
+        }
 
         val next = tetrominoes.random()
         setTetromino(next)
         // Paint the new tetromino.
         paintPoints(next.points)
 
-        (1 until 21).forEach { deltaY ->
+        var scoreFromRows = 0
+        // Loop from the landed y-axis delta, so we don't have to loop the entire board to check for filled rows.
+        (landedYDelta..20).forEach { deltaY ->
             if (board.checkRowFilled(deltaY)) {
+                if (scoreFromRows == 0) scoreFromRows = 100 else scoreFromRows *= 2
+
                 board.wipeRow(deltaY)
                 board.shiftDown(deltaY)
             }
         }
-    }
-
-    private fun setOffset(x: Int, y: Int) {
-        offsetX = x
-        offsetY = y
-    }
-
-    private fun paintPoints(points: Array<Point>) {
-        // Paint the current tetromino the user has control of.
-        board.paintPoints(points, offsetX, 0, tetromino.color)
-        // Paint the saved points already on the board.
-        board.paintSavedPoints()
-    }
-
-    private fun disposeTetromino(deltaX: Int, deltaY: Int) {
-        // Doing it like this is much more efficient than looping the whole board to clear the last tetromino.
-        board.paintPoints(tetromino.points, deltaX, deltaY, Color.BLACK)
-    }
-
-    private fun setTetromino(tetromino: Tetromino) {
-        this.tetromino = tetromino
+        score += scoreFromRows
     }
 
     @Synchronized
@@ -100,6 +117,7 @@ class Tetris {
         }
     }
 
+    @Synchronized
     fun rotate(counterClockwise: Boolean) = tetromino.let {
         val x = offsetX
         val y = offsetY
@@ -109,17 +127,40 @@ class Tetris {
         val index = nextPossible.indexOf(it)
         // The next possible tetromino we can use depending on the rotation type.
         val next = nextPossible.elementAtOrElse(if (counterClockwise) index - 1 else index + 1) { if (counterClockwise) nextPossible.last() else nextPossible.first() }
+        // Check for collision on the y-axis.
+        if (next.pointsAxis(deltaY = 1, otherPoints = it.points).any { point -> board.collides(point.x + x, point.y + y + 1) }) return
         // Check for collision for the next possible tetromino.
-        if (next.points.filter { point -> point !in it.points }.any { point -> board.collides(point.x + x, point.y + y) }) return
-
-        // Set the new tetromino and repaint.
-        disposeTetromino(x, y)
-        setTetromino(next)
-        paintPoints(next.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
+        if (next.pointsAxis(otherPoints = it.points).none { point -> board.collides(point.x + x, point.y + y) }) {
+            // Set the new tetromino and repaint.
+            disposeTetromino(x, y)
+            setTetromino(next)
+            paintPoints(next.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
+        }
     }
 
     @Synchronized
     fun getColor(x: Int, y: Int): Color = board.getColor(x, y)
+
+    private fun setOffset(toOffsetX: Int, toOffsetY: Int) {
+        offsetX = toOffsetX
+        offsetY = toOffsetY
+    }
+
+    private fun paintPoints(points: Array<Point>) {
+        // Paint the current tetromino the user has control of.
+        board.paintPoints(points, offsetX, 0, tetromino.color)
+        // Paint the saved points already on the board.
+        board.paintSavedPoints()
+    }
+
+    private fun disposeTetromino(deltaX: Int, deltaY: Int) {
+        // Doing it like this is much more efficient than looping the whole board to clear the last tetromino.
+        board.paintPoints(tetromino.points, deltaX, deltaY, Color.BLACK)
+    }
+
+    private fun setTetromino(tetromino: Tetromino) {
+        this.tetromino = tetromino
+    }
 
     private companion object {
 

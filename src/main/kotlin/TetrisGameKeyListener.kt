@@ -9,12 +9,19 @@ class TetrisGameKeyListener(
 ) : KeyListener {
 
     override fun keyPressed(e: KeyEvent) {
+        if (gameCapture.tetris.playing.not() && e.keyCode != KeyEvent.VK_SPACE) return
         when (e.keyCode) {
             KeyEvent.VK_LEFT -> gameCapture.tetris.moveOnXAxis(-1)
             KeyEvent.VK_RIGHT -> gameCapture.tetris.moveOnXAxis(1)
             KeyEvent.VK_DOWN -> gameCapture.tetris.rotate(false)
             KeyEvent.VK_UP -> gameCapture.tetris.rotate(true)
-            KeyEvent.VK_SPACE -> gameCapture.tetris.moveOnYAxis(1)
+            KeyEvent.VK_SPACE -> {
+                if (gameCapture.tetris.playing) {
+                    gameCapture.tetris.moveOnYAxis(1)
+                } else {
+                    gameCapture.tetris.startNewGame()
+                }
+            }
         }
     }
 
