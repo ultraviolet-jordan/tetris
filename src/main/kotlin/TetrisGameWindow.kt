@@ -4,6 +4,7 @@ import Constants.TITLE
 import com.jogamp.newt.opengl.GLWindow
 import com.jogamp.opengl.GLCapabilities
 import java.awt.Toolkit
+import kotlin.concurrent.fixedRateTimer
 import kotlin.time.measureTime
 
 /**
@@ -37,10 +38,13 @@ class TetrisGameWindow(
         gameCapture.animator.setUpdateFPSFrames(5, null)
         gameCapture.animator.start()
 
-        do {
+        // 1 second.
+        fixedRateTimer(period = 1000) {
             val time = measureTime { gameCapture.tetris.tick() }
-            Thread.sleep(1000)
             println("Loop took $time to complete.")
-        } while (!Thread.interrupted())
+        }
+
+        // 5 minutes
+        fixedRateTimer(period = 300000) { System.gc() }
     }
 }

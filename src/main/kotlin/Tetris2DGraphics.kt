@@ -17,6 +17,8 @@ class Tetris2DGraphics(
 ) : GLEventListener {
 
     private val graphics = GLGraphics2D()
+    private val backdrop = Color(128, 124, 124)
+    private val backdropDarker = backdrop.darker().darker()
 
     private lateinit var scoreRenderer: TextRenderer
     private lateinit var fpsRenderer: TextRenderer
@@ -51,10 +53,9 @@ class Tetris2DGraphics(
             repeat(ROWS) { y ->
                 val color = gameCapture.tetris.let {
                     val playing = it.playing && !it.paused
-                    val backdrop = Color(128, 124, 124)
                     with(if (playing) it.getColor(x, y) else it.getColor(x, y).darker().darker()) {
                         if (x == 0 || x == 11 || y == 0 || y == 21 && this != backdrop) {
-                            return@with if (playing) backdrop else backdrop.darker().darker()
+                            return@with if (playing) backdrop else backdropDarker
                         }
                         this
                     }
