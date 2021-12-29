@@ -1,4 +1,4 @@
-# A Fast Tetris Game Written in Kotlin Using JOGL.
+# A Fast Tetris Game Written in Kotlin With Java OpenGL.
 
 ![gameplay](https://github.com/ultraviolet-jordan/tetris/blob/main/gameplay.png)
 ![gameover](https://github.com/ultraviolet-jordan/tetris/blob/main/gameover.png)
