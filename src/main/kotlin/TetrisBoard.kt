@@ -19,12 +19,12 @@ class TetrisBoard {
         x: Int,
         y: Int,
         color: Color
-    ) { grid[x][y] = color }
+    ) { if (x in 0..COLS && y in 0..ROWS) grid[x][y] = color }
 
     fun collides(
         x: Int,
         y: Int
-    ): Boolean = grid[x][y] != Color.BLACK || Point(x, y) in points
+    ): Boolean = (x in 0..COLS && y in 0..ROWS) && y != 0 && grid[x][y] != Color.BLACK || Point(x, y) in points
 
     fun paintPoints(
         points: Array<Point>,

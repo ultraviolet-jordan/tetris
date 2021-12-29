@@ -8,14 +8,16 @@ class TetrisGameKeyListener(
     private val gameCapture: TetrisGameCapture
 ) : KeyListener {
 
-    override fun keyPressed(e: KeyEvent) {
-        if (gameCapture.tetris.playing.not() && e.keyCode != KeyEvent.VK_SPACE) return
+    override fun keyPressed(e: KeyEvent) = gameCapture.tetris.let {
+        if (it.playing.not() && e.keyCode != KeyEvent.VK_SPACE) return
+        if (it.paused && e.keyCode != KeyEvent.VK_ESCAPE) return
         when (e.keyCode) {
-            KeyEvent.VK_LEFT -> gameCapture.tetris.moveOnXAxis(-1)
-            KeyEvent.VK_RIGHT -> gameCapture.tetris.moveOnXAxis(1)
-            KeyEvent.VK_DOWN -> gameCapture.tetris.rotate(false)
-            KeyEvent.VK_UP -> gameCapture.tetris.rotate(true)
-            KeyEvent.VK_SPACE -> if (gameCapture.tetris.playing) gameCapture.tetris.moveOnYAxis(1) else gameCapture.tetris.startNewGame()
+            KeyEvent.VK_LEFT -> it.moveOnXAxis(-1)
+            KeyEvent.VK_RIGHT -> it.moveOnXAxis(1)
+            KeyEvent.VK_DOWN -> it.rotate(false)
+            KeyEvent.VK_UP -> it.rotate(true)
+            KeyEvent.VK_SPACE -> if (it.playing) it.moveOnYAxis(1) else it.startNewGame()
+            KeyEvent.VK_ESCAPE -> it.paused = !it.paused
         }
     }
 

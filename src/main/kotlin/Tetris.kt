@@ -13,6 +13,7 @@ class Tetris {
     private var positionY by Delegates.notNull<Int>()
 
     var playing = true
+    var paused = false
     var score = 0
 
     init { startNewGame() }
@@ -20,18 +21,19 @@ class Tetris {
     @Synchronized
     fun startNewGame() {
         // The player can start a new game when one ends, this is why we initialize like this.
-        setPosition(4, 0)
+        setPosition(5, 0)
         board.reset()
         score = 0
         tetromino = tetrominoes.random()
         paintPoints(tetromino.points)
+        paused = false
         // This will ultimately start the game.
         playing = true
     }
 
     @Synchronized
     fun tick() = tetromino.let {
-        if (playing.not()) return
+        if (playing.not() || paused) return
 
         val x = positionX
         val y = positionY
@@ -45,7 +47,7 @@ class Tetris {
             it.pointsAxis(deltaY = 1).none { point -> board.collides(point.x + x, point.y + y + 1) }
         ) {
             // Move the current tetromino and change the offset.
-            paintPoints(it.points.map { point -> Point(point.x, point.y + y + 1) }.toTypedArray())
+            paintPoints(it.points.filterViewable().map { point -> Point(point.x, point.y + y + 1) }.toTypedArray())
             setPosition(x, y + 1)
             return
         }
@@ -54,14 +56,14 @@ class Tetris {
         board.savePoints(it.points, x, y, it.color)
 
         // The default offset.
-        setPosition(4, 0)
+        setPosition(5, 0)
 
         // This is to find the farthest point in the current tetromino to the bottom of the board on the Y-axis.
         // This is much more efficient instead of unnecessarily looping the entire board to check for filled rows.
         val landedYDelta = (y - it.points.minOf { point -> point.y })
 
-        // If this offset is <= 0 this means the tetromino crossed the border at the top when it landed. This means the game is over.
-        if (landedYDelta <= 0) {
+        // If this offset is <= 1 this means the tetromino crossed the border at the top when it landed. This means the game is over.
+        if (landedYDelta <= 1) {
             playing = false
             paintPoints(tetromino.points)
             return
@@ -98,7 +100,7 @@ class Tetris {
         setPosition(x + deltaX, y)
 
         disposeTetromino(if (deltaX == -1) x + deltaX + 1 else x + deltaX - 1, y)
-        paintPoints(it.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
+        paintPoints(it.points.filterViewable().map { point -> Point(point.x, point.y + y) }.toTypedArray())
     }
 
     @Synchronized
@@ -111,7 +113,7 @@ class Tetris {
 
             // coerceAtLeast() because a new tetromino starts at the very top.
             disposeTetromino(x, (y + deltaY - 1).coerceAtLeast(0))
-            paintPoints(it.points.map { point -> Point(point.x, point.y + y + deltaY) }.toTypedArray())
+            paintPoints(it.points.filterViewable().map { point -> Point(point.x, point.y + y + deltaY) }.toTypedArray())
         }
     }
 
@@ -136,7 +138,7 @@ class Tetris {
             // Set the new tetromino and repaint.
             disposeTetromino(x, y)
             setTetromino(nextTetromino)
-            paintPoints(nextTetromino.points.map { point -> Point(point.x, point.y + y) }.toTypedArray())
+            paintPoints(nextTetromino.points.filterViewable().map { point -> Point(point.x, point.y + y) }.toTypedArray())
         }
     }
 
@@ -185,40 +187,40 @@ class Tetris {
 
         // All the tetrominoes that can be used in the game.
         private val tetrominoes = arrayOf(
-            Tetromino(CYAN, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(4, 2))),
-            Tetromino(CYAN, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(2, 4))),
-            Tetromino(CYAN, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(4, 2))),
-            Tetromino(CYAN, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(2, 4))),
+            Tetromino(CYAN, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(3, 1))),
+            Tetromino(CYAN, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(1, 3))),
+            Tetromino(CYAN, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(3, 1))),
+            Tetromino(CYAN, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(1, 3))),
 
-            Tetromino(ORANGE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(3, 1))),
-            Tetromino(ORANGE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(3, 3))),
-            Tetromino(ORANGE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(1, 3))),
-            Tetromino(ORANGE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(1, 1))),
+            Tetromino(ORANGE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(2, 0))),
+            Tetromino(ORANGE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 2))),
+            Tetromino(ORANGE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(0, 2))),
+            Tetromino(ORANGE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 0))),
 
-            Tetromino(BLUE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(3, 3))),
-            Tetromino(BLUE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(1, 3))),
-            Tetromino(BLUE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(1, 1))),
-            Tetromino(BLUE, arrayOf(Point(2, 1), Point(2, 2), Point(2, 3), Point(3, 1))),
+            Tetromino(BLUE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(2, 2))),
+            Tetromino(BLUE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 2))),
+            Tetromino(BLUE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(0, 0))),
+            Tetromino(BLUE, arrayOf(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 0))),
 
-            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
-            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
-            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
-            Tetromino(YELLOW, arrayOf(Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2))),
+            Tetromino(YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
+            Tetromino(YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
+            Tetromino(YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
+            Tetromino(YELLOW, arrayOf(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))),
 
-            Tetromino(GREEN, arrayOf(Point(2, 1), Point(3, 1), Point(1, 2), Point(2, 2))),
-            Tetromino(GREEN, arrayOf(Point(1, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
-            Tetromino(GREEN, arrayOf(Point(2, 1), Point(3, 1), Point(1, 2), Point(2, 2))),
-            Tetromino(GREEN, arrayOf(Point(1, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
+            Tetromino(GREEN, arrayOf(Point(1, 0), Point(2, 0), Point(0, 1), Point(1, 1))),
+            Tetromino(GREEN, arrayOf(Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
+            Tetromino(GREEN, arrayOf(Point(1, 0), Point(2, 0), Point(0, 1), Point(1, 1))),
+            Tetromino(GREEN, arrayOf(Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
 
-            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(3, 2))),
-            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(2, 3))),
-            Tetromino(PURPLE, arrayOf(Point(1, 2), Point(2, 2), Point(3, 2), Point(2, 3))),
-            Tetromino(PURPLE, arrayOf(Point(2, 1), Point(2, 2), Point(3, 2), Point(2, 3))),
+            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(2, 1))),
+            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(1, 2))),
+            Tetromino(PURPLE, arrayOf(Point(0, 1), Point(1, 1), Point(2, 1), Point(1, 2))),
+            Tetromino(PURPLE, arrayOf(Point(1, 0), Point(1, 1), Point(2, 1), Point(1, 2))),
 
-            Tetromino(RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
-            Tetromino(RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
-            Tetromino(RED, arrayOf(Point(1, 1), Point(2, 1), Point(2, 2), Point(3, 2))),
-            Tetromino(RED, arrayOf(Point(2, 1), Point(1, 2), Point(2, 2), Point(1, 3))),
+            Tetromino(RED, arrayOf(Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1))),
+            Tetromino(RED, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(0, 2))),
+            Tetromino(RED, arrayOf(Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1))),
+            Tetromino(RED, arrayOf(Point(1, 0), Point(0, 1), Point(1, 1), Point(0, 2)))
         )
     }
 }

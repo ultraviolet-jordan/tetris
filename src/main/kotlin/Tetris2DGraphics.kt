@@ -21,6 +21,7 @@ class Tetris2DGraphics(
     private lateinit var scoreRenderer: TextRenderer
     private lateinit var fpsRenderer: TextRenderer
     private lateinit var gameOverRenderer: TextRenderer
+    private lateinit var pauseMenuRenderer: TextRenderer
 
     init {
         GLProfile.initSingleton()
@@ -48,7 +49,16 @@ class Tetris2DGraphics(
         // Draw the grid and stylize.
         repeat(COLS) { x ->
             repeat(ROWS) { y ->
-                val color = if (gameCapture.tetris.playing) gameCapture.tetris.getColor(x, y) else gameCapture.tetris.getColor(x, y).darker().darker()
+                val color = gameCapture.tetris.let {
+                    val playing = it.playing && !it.paused
+                    val backdrop = Color(128, 124, 124)
+                    with(if (playing) it.getColor(x, y) else it.getColor(x, y).darker().darker()) {
+                        if (x == 0 || x == 11 || y == 0 || y == 21 && this != backdrop) {
+                            return@with if (playing) backdrop else backdrop.darker().darker()
+                        }
+                        this
+                    }
+                }
                 val widthX = deltaX + (x * scale)
                 val widthY = deltaY + (y * scale)
                 val widthScaleX = widthX + eighth
@@ -89,8 +99,18 @@ class Tetris2DGraphics(
             gameOverRenderer.let {
                 it.beginRendering(width, height)
                 it.setColor(Color.WHITE)
-                it.draw("GAME OVER", deltaX + (((scale * 6) - (half * 3) - quarter) + scale / 3), (height / 2) - deltaY)
+                it.draw("GAME OVER", (width / 2) - graphics.stringHelper.getFontMetrics(it.font).stringWidth("GAME OVER") / 2, height / 2)
                 it.endRendering()
+            }
+        } else {
+            if (gameCapture.tetris.paused) {
+                // Draw the pause menu.
+                pauseMenuRenderer.let {
+                    it.beginRendering(width, height)
+                    it.setColor(Color.WHITE)
+                    it.draw("PAUSED", (width / 2) - graphics.stringHelper.getFontMetrics(it.font).stringWidth("PAUSED") / 2, height / 2)
+                    it.endRendering()
+                }
             }
         }
         graphics.postPaint()
@@ -101,9 +121,7 @@ class Tetris2DGraphics(
         if (height / ROWS < 15) return
         gameCapture.scale = height / ROWS
         // Dispose of the current renderers and update them due to a possible change in scaling.
-        scoreRenderer.dispose()
-        fpsRenderer.dispose()
-        gameOverRenderer.dispose()
+        disposeRenderers()
         attachRenderers()
     }
 
@@ -111,5 +129,13 @@ class Tetris2DGraphics(
         scoreRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2 + 6), true, true)
         fpsRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
         gameOverRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
+        pauseMenuRenderer = TextRenderer(Font("Default", Font.BOLD, gameCapture.scale / 2), true, true)
+    }
+
+    private fun disposeRenderers() {
+        scoreRenderer.dispose()
+        fpsRenderer.dispose()
+        gameOverRenderer.dispose()
+        pauseMenuRenderer.dispose()
     }
 }
