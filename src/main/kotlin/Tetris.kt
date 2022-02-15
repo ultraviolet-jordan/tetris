@@ -65,7 +65,7 @@ class Tetris {
         // If this offset is <= 1 this means the tetromino crossed the border at the top when it landed. This means the game is over.
         if (landedYDelta <= 1) {
             playing = false
-            paintPoints(tetromino.points)
+            paintPoints(it.points)
             return
         }
 
